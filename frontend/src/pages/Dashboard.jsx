@@ -35,7 +35,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const { user, fetchUserProfile } = useAuth();
   const navigate = useNavigate();
-
+  const [data, setData] = useState(null);
   useEffect(() => {
     const fetchAllData = async () => {
       setLoading(true);
@@ -46,11 +46,18 @@ const Dashboard = () => {
           "Content-Type": "application/json",
         };
 
-        const [coursesRes, statsRes] = await Promise.all([
+        const [coursesRes, statsRes,res] = await Promise.all([
           fetch(`${API_BASE_URL}/api/courses`, { headers }),
           fetch(`${API_BASE_URL}/api/courses/stats/cards`, { headers }),
+          fetch(`${API_BASE_URL}/api/certificate/list`, {headers}),
         ]);
-
+        if (res.ok) {
+          const json = await res.json();
+          setData(json);
+        }
+         if (!res.ok) {
+          console.error(`Failed to fetch certificates: ${res.status}`);
+        }
         if (!coursesRes.ok) {
           throw new Error(`Courses API failed: ${coursesRes.status}`);
         }
@@ -76,7 +83,6 @@ const Dashboard = () => {
 
     fetchAllData();
   }, []); // Remove fetchUserProfile dependency to prevent re-fetching on every render
-
   // Calculate dynamic stats based on user's actual progress
   const calculateStats = () => {
     console.log("Calculating stats with user:", user);
@@ -90,7 +96,7 @@ const Dashboard = () => {
       return [
         {
           icon: <Play className="w-5 h-5 text-blue-600" />,
-          value: "0",
+          value: data?.stats.inProgress,
           label: "Ongoing Courses",
           change: "+0%",
           bgColor: "bg-blue-50",
@@ -98,7 +104,7 @@ const Dashboard = () => {
         },
         {
           icon: <CheckCircle className="w-5 h-5 text-green-600" />,
-          value: "0",
+          value: data?.stats.completed,
           label: "Completed",
           change: "+0",
           bgColor: "bg-green-50",
@@ -106,7 +112,7 @@ const Dashboard = () => {
         },
         {
           icon: <Bookmark className="w-5 h-5 text-purple-600" />,
-          value: "0",
+          value: data?.stats.completed,
           label: "Certificates",
           change: "+0",
           bgColor: "bg-purple-50",
