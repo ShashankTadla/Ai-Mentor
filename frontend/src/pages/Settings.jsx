@@ -11,9 +11,9 @@ import {
   Camera,
   Eye,
   EyeOff,
-x  UserX,
-  Sparkles
-  Contact,
+  UserX,
+  Sparkles,
+  Contact
 } from "lucide-react";
 import axios from "axios";
 import Preferences from "../components/Preferences";
@@ -310,7 +310,7 @@ export default function Settings() {
         {/* Main Content */}
         <main className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8 lg:mt-5 min-w-0">
           {activeSetting === "profile" && (
-            <div className="w-full">
+            <nav className="w-full">
               {/* Header */}
               <div className="mb-8">
                 <h1 className="text-xl sm:text-2xl md:text-[30px] font-bold text-main font-[Inter] mb-2">
@@ -321,7 +321,8 @@ export default function Settings() {
                 </p>
               </div>
             </nav>
-          </aside>
+          )}
+        </main>
 
           {/* Mobile Settings Tab Bar — visible only on small screens */}
           <div className="lg:hidden flex overflow-x-auto gap-2 px-4 pt-3 pb-2 no-scrollbar">
