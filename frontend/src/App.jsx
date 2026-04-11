@@ -65,6 +65,7 @@ const App = () => {
             <Route path="/watchedvideos" element={<WatchedVideos />} />
             <Route path="/learning/:id" element={<LearningPage />} />
             <Route path="/success" element={<Success />} />
+          </Route>
         </Route>
 
         {/* Other public routes */}
