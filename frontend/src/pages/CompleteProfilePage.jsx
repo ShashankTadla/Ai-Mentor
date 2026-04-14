@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import AuthLayout from "../components/auth/AuthLayout";
 import { Eye, EyeOff, Check, X, Camera, User as UserIcon } from "lucide-react";
 import toast from "react-hot-toast";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 /* ─── Reusable form input (consistent with Login/Signup) ─── */
 const FormInput = ({ label, type, placeholder, value, onChange, required = true }) => (
@@ -59,15 +60,25 @@ const CompleteProfilePage = () => {
   const [avatar, setAvatar] = useState(null);
   
   // Pre-fill avatar preview with existing URL, or a DiceBear fallback for Google users without a photo
-  const getInitialAvatar = () => {
-    if (user?.avatar_url) return user.avatar_url;
-    // Only use DiceBear initials for Google users
-    if (isGoogleUser || user?.googleId || user?.isGoogleUser) {
-      const seed = encodeURIComponent(`${firstName || user?.firstName || ""} ${lastName || user?.lastName || ""}`.trim() || user?.name || "User");
-      return `https://api.dicebear.com/8.x/initials/svg?seed=${seed}`;
-    }
-    return null;
-  };
+  
+const getInitialAvatar = () => {
+  // ✅ Priority 1: DB image
+  if (user?.avatar_url) return user.avatar_url;
+
+  // ✅ Priority 2: Google image
+  const firebaseUser = getAuth().currentUser;
+  if (firebaseUser?.photoURL) return firebaseUser.photoURL;
+
+  // ✅ Fallback only if no image
+  if (isGoogleUser) {
+    const seed = encodeURIComponent(
+      `${firstName || ""} ${lastName || ""}`.trim() || "User"
+    );
+    return `https://api.dicebear.com/8.x/initials/svg?seed=${seed}`;
+  }
+
+  return null;
+};
 
   const [avatarPreview, setAvatarPreview] = useState(getInitialAvatar());
   const [loading, setLoading] = useState(false);
@@ -86,6 +97,34 @@ const CompleteProfilePage = () => {
       }
     }
   }, [user, avatar]);
+
+  useEffect(() => {
+  if (!isGoogleUser) return;
+
+  const auth = getAuth();
+
+  const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    if (firebaseUser) {
+      // ✅ Get name from Google
+      const fullName = firebaseUser.displayName || "";
+      const names = fullName.split(" ");
+
+      const fName = names[0] || "";
+      const lName = names.slice(1).join(" ") || "";
+
+      // ✅ Only set if DB values are empty (IMPORTANT)
+      if (!user?.firstName) setFirstName(fName);
+      if (!user?.lastName) setLastName(lName);
+
+      // ✅ Set profile image from Google
+      if (!user?.avatar_url && firebaseUser.photoURL) {
+        setAvatarPreview(firebaseUser.photoURL);
+      }
+    }
+  });
+
+  return () => unsubscribe();
+}, [isGoogleUser, user]);
 
   /* ─── Password requirements (Google users only) ─── */
   const passwordRequirements = {
@@ -172,9 +211,13 @@ const CompleteProfilePage = () => {
         formData.append("bio", bio.trim());
       }
 
-      if (showAvatarField && avatar) {
-        formData.append("avatar", avatar);
-      }
+      if (showAvatarField) {
+  if (avatar) {
+    formData.append("avatar", avatar);
+  } else if (avatarPreview) {
+    formData.append("avatar_url", avatarPreview); // Google image
+  }
+}
 
       const response = await fetch(
         `${import.meta.env.VITE_API_BASE_URL}/api/users/complete-profile`,
