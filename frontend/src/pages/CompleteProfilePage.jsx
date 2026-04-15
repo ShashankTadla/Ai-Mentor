@@ -211,12 +211,21 @@ const getInitialAvatar = () => {
         formData.append("bio", bio.trim());
       }
 
-      if (showAvatarField) {
-  if (avatar) {
-    formData.append("avatar", avatar);
-  } else if (avatarPreview) {
-    formData.append("avatar_url", avatarPreview); // Google image
-  }
+      const firebaseUser = getAuth().currentUser;
+
+if (avatar) {
+  formData.append("avatar", avatar);
+} 
+else if (firebaseUser?.photoURL) {
+  // 🔥 Convert URL → File
+  const response = await fetch(firebaseUser.photoURL);
+  const blob = await response.blob();
+
+  const file = new File([blob], "google-profile.jpg", {
+    type: blob.type,
+  });
+
+  formData.append("avatar", file);
 }
 
       const response = await fetch(
