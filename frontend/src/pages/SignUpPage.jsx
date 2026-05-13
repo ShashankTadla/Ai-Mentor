@@ -6,6 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import AuthLayout from "../components/auth/AuthLayout";
 import SocialLogin from "../components/auth/SocialLogin";
 import toast from "react-hot-toast";
+import API_BASE_URL from "../lib/api";
 
 /* FormInput stays UI-only */
 const FormInput = ({ label, type, placeholder, value, onChange }) => {
@@ -72,7 +73,7 @@ const SignUpPage = () => {
 
     setLoading(true);
     try {
-      const response = await fetch(`/api/users/register`, {
+      const response = await fetch(`${API_BASE_URL}/api/users/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -40,7 +40,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: process.env.FRONTEND_URL || "https://ai-mentor-olive.vercel.app",
     credentials: true,
   }),
 );
@@ -103,7 +103,7 @@ const startServer = async () => {
         : "✅ Database models synced",
     );
     app.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
+      console.log(`🚀 Server running on ${PORT}`);
     });
   } catch (error) {
     console.error("❌ Server failed:", error);
