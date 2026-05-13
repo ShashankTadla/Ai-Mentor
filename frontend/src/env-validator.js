@@ -1,6 +1,6 @@
 
 const REQUIRED_ENV_VARS = [
-  { key: "VITE_API_BASE_URL",                 hint: "Backend server URL (e.g. http://localhost:5000)" },
+  { key: "VITE_API_BASE_URL",                 hint: "Backend server URL (e.g. https://ai-mentor-wmeu.onrender.com" },
   { key: "VITE_FIREBASE_API_KEY",             hint: "Firebase API key" },
   { key: "VITE_FIREBASE_AUTH_DOMAIN",         hint: "Firebase auth domain (e.g. your-project.firebaseapp.com)" },
   { key: "VITE_FIREBASE_PROJECT_ID",          hint: "Firebase project ID" },
