@@ -26,7 +26,7 @@ import "./models/CommunityPost.js";
 import "./models/Notification.js";
 import "./models/Report.js";
 import "./models/modelAssociations.js";
-import "./models/contactMessage.js";
+import "./models/Contactmessage.js";
 
 dotenv.config();
 
