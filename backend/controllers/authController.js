@@ -138,10 +138,15 @@ const googleLogin = async (req, res) => {
   try {
     const { idToken } = req.body;
 
-    const payload = JSON.parse(
-      Buffer.from(idToken.split(".")[1], "base64").toString()
-    );
+    const base64Payload = idToken.split(".")[1];
 
+if (!base64Payload) {
+  return res.status(400).json({ message: "Invalid Google token" });
+}
+
+const payload = JSON.parse(
+  Buffer.from(base64Payload, "base64").toString("utf8")
+);
     // console.log("Google Login Payload:", JSON.stringify(payload, null, 2));
     const uid = payload.sub;
     const email = payload.email;
