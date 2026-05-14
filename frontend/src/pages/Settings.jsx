@@ -238,21 +238,35 @@ export default function Settings() {
   }, [user]);
 
   useEffect(() => {
-    const fetchNotificationSettings = async () => {
-      if (!user) return;
-      try {
-        const token = localStorage.getItem("token");
-        const { data } = await axios.get("/api/users/settings", { headers: { Authorization: `Bearer ${token}` } });
-        const notifications = data?.notifications
-          ? JSON.parse(JSON.stringify(data.notifications))
-          : null;
-        setSettingsData(data);
-        setOriginalNotifications(notifications);
-        if (data?.appearance?.language) i18n.changeLanguage(data.appearance.language);
-      } catch (err) { console.error("Failed to fetch notification settings:", err); }
-    };
-    fetchNotificationSettings();
-  }, [user]);
+  const fetchNotificationSettings = async () => {
+    if (!user) return;
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const { data } = await axios.get("/api/users/settings", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const notifications = data?.notifications
+        ? JSON.parse(JSON.stringify(data.notifications))
+        : null;
+
+      setSettingsData(data);
+      setOriginalNotifications(notifications);
+
+      if (data?.appearance?.language) {
+        i18n.changeLanguage(data.appearance.language);
+      }
+    } catch (err) {
+      console.error("Failed to fetch notification settings:", err);
+    } finally {
+      setPageLoading(false);
+    }
+  };
+
+  fetchNotificationSettings();
+}, [user]);
 
   /* mobile navigation helpers */
   const handleMobileSelect = (key) => {
