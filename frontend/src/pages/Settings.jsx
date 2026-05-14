@@ -1,4 +1,5 @@
 // frontend/src/pages/Settings.jsx
+
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -6,6 +7,7 @@ import {
   Eye, EyeOff, UserX, Sparkles, ArrowLeft, X, ChevronRight,
 } from "lucide-react";
 import axios from "axios";
+axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
 import Preferences from "../components/Preferences";
 import { useTheme } from "../context/ThemeContext";
 import toast from "react-hot-toast";
