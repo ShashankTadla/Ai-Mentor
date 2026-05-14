@@ -72,9 +72,15 @@ const Analytics = () => {
         const token = localStorage.getItem("token");
         const headers = { Authorization: `Bearer ${token}` };
 
-        const coursesRes = await fetch("/api/courses", { headers });
-        const analyticsRes = await fetch("/api/analytics", { headers });
+        const coursesRes = await fetch(
+  `${API_BASE_URL}/api/courses`,
+  { headers }
+);
 
+const analyticsRes = await fetch(
+  `${API_BASE_URL}/api/analytics`,
+  { headers }
+);
         const coursesData = await coursesRes.json();
         const analyticsData = await analyticsRes.json();
 

@@ -117,7 +117,7 @@ export default function Learning() {
     const fetchLearningData = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch(`/api/courses/${courseId}/learning`, {
+        const response = await fetch(`${API_BASE_URL}/api/courses/${courseId}/learning`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (response.ok) {
@@ -312,7 +312,7 @@ export default function Learning() {
 
             if (!isReady) {
               while (!isReady && attempts < 60) {
-                const statusRes = await fetch(`/api/ai/status/${data.jobId}`, {
+                const statusRes = await fetch(`${API_BASE_URL}/api/ai/status/${data.jobId}`, {
                   headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
                 });
                 const statusData = await statusRes.json();
@@ -338,7 +338,7 @@ export default function Learning() {
 
             if (data.transcriptName) {
               try {
-                const trRes = await fetch(`/api/ai/transcript/${data.transcriptName}`, {
+                const trRes = await fetch(`${API_BASE_URL}/api/ai/transcript/${data.transcriptName}`, {
                   headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
                 });
                 if (trRes.ok) {
@@ -423,7 +423,7 @@ export default function Learning() {
   const saveLessonData = async (lessonId, data) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("/api/users/course-progress", {
+      const res = await fetch(`${API_BASE_URL}/api/users/course-progress`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({
@@ -453,7 +453,7 @@ export default function Learning() {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("/api/users/course-progress", {
+      const res = await fetch(`${API_BASE_URL}/api/users/course-progress`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({

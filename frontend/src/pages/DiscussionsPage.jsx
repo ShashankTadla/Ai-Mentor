@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useTranslation } from "react-i18next";
+import API_BASE_URL from "../lib/api";
 import {
   MessageCircle,
   ThumbsUp,
@@ -162,7 +163,7 @@ const DiscussionsPage = () => {
   const [openDropdown, setOpenDropdown] = useState(null); // stores postId or replyId of open dropdown
 
   const isAdmin = user?.role === "admin";
-
+  
   const panelRef = useRef(null);
   const lastHandledFocusKeyRef = useRef("");
 
@@ -224,7 +225,7 @@ const DiscussionsPage = () => {
   // Fetch all courses (from courses.json via API)
   const fetchAllCourses = useCallback(async () => {
     try {
-      const res = await fetch("/api/courses", {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/courses`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) return;
@@ -243,7 +244,7 @@ const DiscussionsPage = () => {
       setCoursePostsLoading(true);
       try {
         const q = sort === "Popular" ? "?sort=popular" : "";
-        const res = await fetch(`/api/community/course-posts${q}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/community/course-posts${q}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error();
@@ -264,7 +265,7 @@ const DiscussionsPage = () => {
       setPanelRequiresEnrollment(false);
       try {
         const q = sort === "Popular" ? "?sort=popular" : "";
-        const res = await fetch(`/api/community/course/${courseId}${q}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/community/course/${courseId}${q}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -304,7 +305,7 @@ const DiscussionsPage = () => {
         const params = new URLSearchParams();
         if (cat && cat !== "All Categories") params.set("category", cat);
         if (sort === "Popular") params.set("sort", "popular");
-        const res = await fetch(`/api/community/global?${params}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/community/global?${params}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error();
@@ -320,7 +321,7 @@ const DiscussionsPage = () => {
 
   // Create post
   const createPost = async (body) => {
-    const res = await fetch("/api/community", {
+    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/community`, {
       method: "POST",
       headers: authHeaders(),
       body: JSON.stringify(body),
@@ -332,7 +333,7 @@ const DiscussionsPage = () => {
   // Like / dislike / reply
   const doAction = async (id, action, body) => {
     const method = action === "reply" ? "POST" : "PUT";
-    const res = await fetch(`/api/community/${id}/${action}`, {
+    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/community/${id}/${action}`, {
       method,
       headers: authHeaders(),
       body: body ? JSON.stringify(body) : undefined,
@@ -348,7 +349,7 @@ const DiscussionsPage = () => {
     if (!reportDescription.trim() || !reportModal.postId) return;
     setReportSubmitting(true);
     try {
-      const res = await fetch(`/api/community/${reportModal.postId}/report`, {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/community/${reportModal.postId}/report`, {
         method: "POST",
         headers: authHeaders(),
         body: JSON.stringify({
@@ -380,7 +381,7 @@ const DiscussionsPage = () => {
   const handleEditReply = async (postId, replyId, newText) => {
     if (!newText.trim()) return;
     try {
-      const res = await fetch(`/api/community/${postId}/reply/${replyId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/community/${postId}/reply/${replyId}`, {
         method: "PUT",
         headers: authHeaders(),
         body: JSON.stringify({ text: newText }),
@@ -415,7 +416,7 @@ const DiscussionsPage = () => {
   // Delete a reply
   const handleDeleteReply = async (postId, replyId) => {
     try {
-      const res = await fetch(`/api/community/${postId}/reply/${replyId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/community/${postId}/reply/${replyId}`, {
         method: "DELETE",
         headers: authHeaders(),
       });
@@ -447,7 +448,7 @@ const DiscussionsPage = () => {
   const handleEditPost = async (postId, newContent) => {
     if (!newContent.trim()) return;
     try {
-      const res = await fetch(`/api/community/${postId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/community/${postId}`, {
         method: "PUT",
         headers: authHeaders(),
         body: JSON.stringify({ content: newContent }),
@@ -482,7 +483,7 @@ const DiscussionsPage = () => {
   // Delete a post
   const handleDeletePost = async (postId) => {
     try {
-      const res = await fetch(`/api/community/${postId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/community/${postId}`, {
         method: "DELETE",
         headers: authHeaders(),
       });
@@ -507,7 +508,7 @@ const DiscussionsPage = () => {
   const fetchReports = useCallback(async () => {
     if (!isAdmin) return;
     try {
-      const res = await fetch("/api/community/reports", {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/community/reports`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) setReports(await res.json());
@@ -518,7 +519,7 @@ const DiscussionsPage = () => {
 
   const executeModeration = async (reportId, action) => {
     try {
-      const res = await fetch(`/api/community/reports/${reportId}`, {
+      const res = await fetch(`${API_BASE_URL}/api/community/reports/${reportId}`, {
         method: "PUT",
         headers: authHeaders(),
         body: JSON.stringify({ action }),
@@ -560,7 +561,7 @@ const DiscussionsPage = () => {
 
   const handleUnhide = async (postId, replyId = null) => {
     try {
-      const res = await fetch(`/api/community/${postId}/unhide`, {
+      const res = await fetch(`${API_BASE_URL}/api/community/${postId}/unhide`, {
         method: "PUT",
         headers: authHeaders(),
         body: JSON.stringify(replyId ? { replyId } : {}),
